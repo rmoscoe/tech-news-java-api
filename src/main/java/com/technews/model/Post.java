@@ -31,7 +31,7 @@ public class Post implements Serializable {
     @Temporal(TemporalType.DATE)
     @Column(name = "updated_at")
     private Date updatedAt = new Date();
-    @OneToMany(mappedBy = "postID", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Comment> comments;
 
     public Post() {
