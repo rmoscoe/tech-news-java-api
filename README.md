@@ -2,14 +2,14 @@
 
 ## Technology Used 
 
-| Technology Used         | Resource URL           | 
-| ------------- |:-------------:| 
-| Java    | [https://www.oracle.com/java/](https://www.oracle.com/java/) | 
-| Spring Boot    | [https://spring.io/projects/spring-boot](https://spring.io/projects/spring-boot)      |   
-| Thymeleaf | [https://www.thymeleaf.org/](https://www.thymeleaf.org/)     |    
-| Bcrypt | [https://mvnrepository.com/artifact/org.mindrot.bcrypt/bcrypt/0.3](https://mvnrepository.com/artifact/org.mindrot.bcrypt/bcrypt/0.3) |
-| MySQL | [https://www.mysql.com/](https://www.mysql.com/) |
-| Heroku | [https://www.heroku.com/](https://www.heroku.com/) |
+| Technology Used |                                                             Resource URL                                                             |
+| --------------- | :----------------------------------------------------------------------------------------------------------------------------------: |
+| Java            |                                     [https://www.oracle.com/java/](https://www.oracle.com/java/)                                     |
+| Spring Boot     |                           [https://spring.io/projects/spring-boot](https://spring.io/projects/spring-boot)                           |
+| Thymeleaf       |                                       [https://www.thymeleaf.org/](https://www.thymeleaf.org/)                                       |
+| Bcrypt          | [https://mvnrepository.com/artifact/org.mindrot.bcrypt/bcrypt/0.3](https://mvnrepository.com/artifact/org.mindrot.bcrypt/bcrypt/0.3) |
+| MySQL           |                                           [https://www.mysql.com/](https://www.mysql.com/)                                           |
+| Heroku          |                                          [https://www.heroku.com/](https://www.heroku.com/)                                          |
 
 <br/>
 
@@ -21,57 +21,52 @@ Just Tech News allows users to post links to news stories related to technology,
 
 <br/>
 
-![Site Langing Page](./assets/images/homepage.png)
+![Site Langing Page](./assets/images/landing.png)
 
 <br/>
 
 ## Code Refactor Example
 
-Here is an example of an API route for creating a post, refactored with Python and Flask.
+Here is an example of an API route for creating a post, refactored with Java and Spring Boot.
 
 
-```python
-@bp.route('/posts', methods=['POST'])
-@login_required
-def create():
-  data = request.get_json()
-  db = get_db()
-
-  try:
-    # create a new post
-    newPost = Post(
-      title = data['title'],
-      post_url = data['post_url'],
-      user_id = session.get('user_id')
-    )
-
-    db.add(newPost)
-    db.commit()
-  except:
-    print(sys.exc_info()[0])
-
-    db.rollback()
-    return jsonify(message = 'Post failed'), 500
-
-  return jsonify(id = newPost.id)
+```java
+@PostMapping("/api/posts")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Post addPost(@RequestBody Post post) {
+        repository.save(post);
+        return post;
+    }
 ```
 
 <br/>
 
-The following examlple shows the post-info partial updated for Jinja. Helper functions called within the template transform the data passed to the template before rendering.
+The following examlple shows part of the post fragment updated for Thymeleaf. Instead of helper functions, Thymeleaf uses conditional statements to transform the data passed to the template before rendering and select which version of the content to render.
 
-```jinja
-<article class="post">
+```html
+<article class="post" th:fragment="post-fragment">
   <div class="title">
-    <a href="{{post.post_url}}" target="_blank">{{post.title}}</a>
-    <span>({{post.post_url|format_url}})</span>
-  </div>
-  <div class="meta">
-    {{post.vote_count}} {{post.vote_count|format_plural('point')}} by {{post.user.username}} on {{post.created_at|format_date}}
-    |
-    <a href="/post/{{post.id}}">{{post.comments|length}} {{post.comments|length|format_plural('comment')}}</a>
-  </div>
-</article>
+    <a th:href="@{ ${post.postUrl} }" target="_blank">[[${post.title}]]</a>
+
+    <div th:if="${#strings.contains(post.postUrl, 'http://')}">
+      <div th:with="arg=${#strings.replace(post.postUrl,'http://','')}">
+        <div th:if="${#strings.contains(arg, '/')}">
+          <div th:with="arg2=${#strings.arraySplit(arg, '/')}">
+            <span th:text="${#strings.toString(arg2[0])}"></span>
+          </div>
+        </div>
+        <div th:unless="${#strings.contains(arg, '/')}">
+          <div th:if="${#strings.contains(arg, '?')}">
+            <div th:with="arg2=${#strings.arraySplit(arg, '?')}">
+              <span th:text="${#strings.toString(arg2[0])}"></span>
+            </div>
+          </div>
+          <div th:unless="${#strings.contains(arg, '?')}">
+            <span th:text="${#strings.toString(arg)}"></span>
+          </div>
+        </div>
+      </div>
+    </div>
 ```
 
 <br/>
@@ -92,7 +87,7 @@ Logging in takes a user to the Dashboard. Users can view their existing posts an
 
 Clicking ***edit post*** allows the user to update the title, add a comment, or delete the post.
 
-![Edit post form](./assets/images/edit.png)
+![Edit post form](./assets/images/edit-post.png)
 
 By clicking the number of existing comments on a post, a user can view and add comments or upvote the post.
 
@@ -102,12 +97,10 @@ By clicking the number of existing comments on a post, a user can view and add c
 
 ## Learning Points 
 
-This project provided some review of Python, but primarily I learned to use the following technologies in order to create a web application in a Python ecosystem:
-* Flask for building a server
-* Green Unicorn (gunicorn) for building a production server
-* Jinja as a template engine
-* PyMySQL for connecting to a MySQL database
-* SQLAlchemy as an Object Relational Mapper (ORM)
+This project provided some review of Java, but primarily I learned to use the following technologies in order to create a web application in a Java ecosystem:
+* Spring Boot for building a server
+* Spring Boot as an ORM for MySQL
+* Thymeleaf as a template engine
 
 <br/>
 
